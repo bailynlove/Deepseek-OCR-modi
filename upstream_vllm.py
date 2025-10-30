@@ -1,3 +1,4 @@
+import os
 import base64
 from openai import OpenAI
 from vllm import LLM, SamplingParams
@@ -79,15 +80,21 @@ def llm_vllm(_images):
     model_outputs = llm.generate(model_input, sampling_param)
 
     # Print output
-    for i, output in enumerate(model_outputs):
-        # 关键点：从 output 对象中获取 prompt_token_ids 列表的长度
-        num_input_tokens = len(output.prompt_token_ids)
+    total_tokens = 0
+    with open("dsocr_output.txt", "w", encoding="utf-8") as f:
+        for i, output in enumerate(model_outputs):
+            # 关键点：从 output 对象中获取 prompt_token_ids 列表的长度
+            num_input_tokens = len(output.prompt_token_ids)
+            total_tokens += num_input_tokens
 
-        print(f"\n[Request {i + 1}]")
-        print(f"Input prompt: {output.prompt!r}")
-        print(f"Number of Input Tokens: {num_input_tokens}")  # 打印输入 token 数量
-        print(f"Generated Text: {output.outputs[0].text!r}")
-        print("-" * 25)
+            print(f"\n[Request {i + 1}]")
+            print(f"Input prompt: {output.prompt!r}")
+            print(f"Number of Input Tokens: {num_input_tokens}")  # 打印输入 token 数量
+            print(f"Generated Text: {output.outputs[0].text!r}")
+            print("-" * 25)
+            f.write(f"{output.outputs[0].text!r}")
+
+    os.rename("dsocr_output.txt", f"dsocr_output_{total_tokens}.txt")
 
 
 def llm_api(_images):
