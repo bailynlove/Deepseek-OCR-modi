@@ -154,3 +154,7 @@ def main():
 
     print("\n--- LLM API Inference ---")
     # llm_api(generated_images)
+
+
+if __name__ == "__main__":
+    main()
