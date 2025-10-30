@@ -30,7 +30,9 @@ def render_images():
 
 def llm_vllm(_images):
     prompt = "<image>\nFree OCR."
-    model_input = []
+    with open(INPUT_FILE, 'r', encoding='utf-8') as f:
+        text = f.read()
+    model_input = [{"prompt": f"{prompt}{text}"}]
     print(f"\nGenerated {len(_images)} image(s):")
     for img_path in _images:
         model_input.append({
