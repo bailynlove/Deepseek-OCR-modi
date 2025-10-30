@@ -20,6 +20,8 @@ prompt = "<image>\n<|grounding|>Convert the document to markdown. "
 image_file = 'your_image.jpg'
 output_path = 'your/output/dir'
 
+input_ids = tokenizer.encode(prompt, add_special_tokens=False)
+
 
 
 # infer(self, tokenizer, prompt='', image_file='', output_path = ' ', base_size = 1024, image_size = 640, crop_mode = True, test_compress = False, save_results = False):
