@@ -1,6 +1,6 @@
 {
-      "page-size": "595,842",
-      "dpi": 72,
+      "page-size": "2000, 2000",
+      "dpi": 144,
       "margin-x": 10,
       "margin-y": 10,
       "font-path": "./config/Verdana.ttf",
@@ -19,5 +19,5 @@
       "page-bg-color": "#FFFFFF",
       "para-bg-color": "#FFFFFF",
       "auto-crop-width": true,
-      "auto-crop-last-page": true
+      "auto-crop-last-page": false
 }
