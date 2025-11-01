@@ -1,7 +1,10 @@
+import argparse
 import os
+import torch
 import base64
 from openai import OpenAI
 from vllm import LLM, SamplingParams
+from transformers import AutoModel, AutoTokenizer
 from vllm.model_executor.models.deepseek_ocr import NGramPerReqLogitsProcessor
 from PIL import Image
 
@@ -154,16 +157,55 @@ def llm_api(_images):
             print(f"\n[Request {i + 1}] Error during API call: {e}")
 
 
-def main():
+def llm_hf(_images):
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+
+    model_name = 'deepseek-ai/DeepSeek-OCR'
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    model = AutoModel.from_pretrained(model_name, _attn_implementation='flash_attention_2', trust_remote_code=True,
+                                      use_safetensors=True)
+    model = model.eval().cuda().to(torch.bfloat16)
+
+    # prompt = "<image>\nFree OCR. "
+    prompt = "<image>\n<|grounding|>Convert the document to markdown. "
+    # image_file = 'your_image.jpg'
+    output_path = 'outputs/hf_results'
+
+    input_ids = tokenizer.encode(prompt, add_special_tokens=False)
+
+    # infer(self, tokenizer, prompt='', image_file='', output_path = ' ', base_size = 1024, image_size = 640, crop_mode = True, test_compress = False, save_results = False):
+
+    # Tiny: base_size = 512, image_size = 512, crop_mode = False
+    # Small: base_size = 640, image_size = 640, crop_mode = False
+    # Base: base_size = 1024, image_size = 1024, crop_mode = False
+    # Large: base_size = 1280, image_size = 1280, crop_mode = False
+
+    # Gundam: base_size = 1024, image_size = 640, crop_mode = True
+    for image_file in _images:
+        model.infer(tokenizer, prompt=prompt, image_file=image_file, output_path=output_path, base_size=1024,
+                    image_size=640, crop_mode=True, save_results=True, test_compress=True)  # base
+
+
+def main(mode='hf'):
     generated_images = render_images()
     # Collect generated image paths
 
-    print("\n--- LLM VLLM Inference ---")
-    llm_vllm(generated_images)
-
-    print("\n--- LLM API Inference ---")
-    # llm_api(generated_images)
+    if mode == 'hf':
+        print("\n--- LLM HF Inference ---")
+        llm_hf(generated_images)
+    elif mode == 'vllm':
+        print("\n--- LLM VLLM Inference ---")
+        llm_vllm(generated_images)
+    elif mode == 'api':
+        print("\n--- LLM API Inference ---")
+        llm_api(generated_images)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Upstream VLLM OCR Inference')
+    parser.add_argument('--mode', type=str, default='hf', choices=['hf', 'vllm', 'api'],
+                        help='Mode of LLM inference: hf (Hugging Face), vllm (VLLM), api (OpenAI-compatible API)')
+    args = parser.parse_args()
+    # mode = args.mode
+    main(args.mode)
