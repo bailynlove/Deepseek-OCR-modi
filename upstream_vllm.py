@@ -5,7 +5,6 @@ import base64
 from openai import OpenAI
 from vllm import LLM, SamplingParams
 from transformers import AutoModel, AutoTokenizer
-from vllm.model_executor.models.deepseek_ocr import NGramPerReqLogitsProcessor
 from PIL import Image
 
 from word2png_function import text_to_images
@@ -33,6 +32,7 @@ def render_images():
 
 
 def llm_vllm(_images):
+    from vllm.model_executor.models.deepseek_ocr import NGramPerReqLogitsProcessor
     prompt = "<image>\nFree OCR."
     with open(INPUT_FILE, 'r', encoding='utf-8') as f:
         text = f.read()
