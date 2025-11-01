@@ -190,6 +190,9 @@ def llm_hf(_images):
 def main(mode='hf'):
     generated_images = render_images()
     # Collect generated image paths
+    print("\nGenerated Images:")
+    for img_path in generated_images:
+        print(f"  {img_path}")
 
     if mode == 'hf':
         print("\n--- LLM HF Inference ---")
