@@ -168,7 +168,8 @@ def llm_hf(_images):
     model = model.eval().cuda().to(torch.bfloat16)
 
     # prompt = "<image>\nFree OCR. "
-    prompt = "<image>\n<|grounding|>Convert the document to markdown. "
+    # prompt = "<image>\n<|grounding|>Convert the document to markdown. "
+    prompts = ["<image>\nFree OCR.", "<image>\nExample Usage中的Example 1是什么？", "<image>\n总结代码的主要功能。"]
     # image_file = 'your_image.jpg'
     output_path = 'outputs/hf_results'
 
@@ -182,9 +183,10 @@ def llm_hf(_images):
     # Large: base_size = 1280, image_size = 1280, crop_mode = False
 
     # Gundam: base_size = 1024, image_size = 640, crop_mode = True
-    for image_file in _images:
-        model.infer(tokenizer, prompt=prompt, image_file=image_file, output_path=output_path, base_size=1024,
-                    image_size=640, crop_mode=True, save_results=True, test_compress=True)  # base
+    for prompt in prompts:
+        for image_file in _images:
+            model.infer(tokenizer, prompt=prompt, image_file=image_file, output_path=output_path, base_size=1024,
+                        image_size=640, crop_mode=True, save_results=True, test_compress=True)  # base
 
 
 def main(mode='hf'):
