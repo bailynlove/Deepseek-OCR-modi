@@ -173,7 +173,7 @@ def llm_hf(_images):
     # image_file = 'your_image.jpg'
     output_path = 'outputs/hf_results'
 
-    input_ids = tokenizer.encode(prompt, add_special_tokens=False)
+    # input_ids = tokenizer.encode(prompt, add_special_tokens=False)
 
     # infer(self, tokenizer, prompt='', image_file='', output_path = ' ', base_size = 1024, image_size = 640, crop_mode = True, test_compress = False, save_results = False):
 
@@ -183,7 +183,9 @@ def llm_hf(_images):
     # Large: base_size = 1280, image_size = 1280, crop_mode = False
 
     # Gundam: base_size = 1024, image_size = 640, crop_mode = True
-    for prompt in prompts:
+    for i, prompt in enumerate(prompts):
+        output_path = f'outputs/hf_results/prompt_{i+1}'
+        print(f"\n--- Processing Prompt {i+1} ---")
         for image_file in _images:
             model.infer(tokenizer, prompt=prompt, image_file=image_file, output_path=output_path, base_size=1024,
                         image_size=640, crop_mode=True, save_results=True, test_compress=True)  # base
